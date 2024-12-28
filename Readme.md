@@ -113,12 +113,6 @@ The output will be an SVG file named `output_graph.svg`, visually representing t
 
 ---
 
-## License
-
-This project is open-source and available under the [MIT License](LICENSE).
-
----
-
 ## Acknowledgments
 
 - **Graphviz**: Used for visualizing sentence structures.
