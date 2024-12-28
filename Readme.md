@@ -42,13 +42,25 @@ cd <repository_name>
 
 ### Step 2: Create a Virtual Environment
 ```bash
+#for windows
 python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source venv/bin/activate  # On Windows: venv\Scripts\activat
+
+# for linux
+
+sudo apt update
+sudo apt install python3-venv
+
+python3 -m venv venv
+
+source venv/bin/activate
+
 ```
+
 
 ### Step 3: Install Requirements
 ```bash
-pip install -r requirements.txt
+pip install graphviz
 ```
 
 ### Step 4: Make the Shell Script Executable
@@ -61,16 +73,19 @@ chmod +x USR_to_Graph.sh
 ## How to Use
 
 ### Step 1: Prepare Your Input File
-Create a text file (`input_file.txt`) containing the USR data in the expected format. For example:
+Create a text file (`input_file.txt`) containing the USR data in the  vertical format. For example:
 
 ```
-<sent_id=Geonios_ch_0002>
-#उसका एक दोस्त मोहन है ।
-$wyax	1	-	-	3:rhh	1.1:coref	-	-	-
-eka_1(a_2)	2	-	-	3:quant	-	-	-
-xoswa_1(friend_1)	3	-	-	5:k1	-	-	-
-mohana	4	per/male	-	5:k1s	-	-	-
-hE_1-pres(state_copula_1-pres)	5	-	-	0:main	-	-	-
+<sent_id=3>
+#राम और मोहन पास के एक स्कूल में पढ़ते हैं ।
+#Ram and Mohan study in a nearby school ।
+rAma	6	per/male	-	-	-	-	-	1:op1
+mohana	7	per/male	-	-	-	-	-	1:op2
+[conj_1]	1	-	-	5:k1	-	-	-	-
+pAsa_1(nearby_1)	2	-	-	4:r6	-	-	-	-
+eka_1(a_2)	3	-	-	4:quant	-	-	-	-
+skUla_1(school_10)	4	-	-	5:k7p	-	-	-	-
+paDZa_1-wA_hE_1(study_3-pres)	5	-	-	0:main	-	-	-	-
 %affirmative
 </sent_id>
 ```
