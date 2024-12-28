@@ -1,77 +1,125 @@
 # USR Parser and Visualizer
 
-This project provides a Python-based tool to parse USR (Universal Sentence Representation) data and visualize its hierarchical structure using Graphviz. The parser processes tokenized sentence data with dependency relations, and then generates a graphical representation in the form of an SVG file.
+This project provides a Python-based tool to parse USR (Universal Sentence Representation) data and visualize its hierarchical structure using Graphviz. The parser processes tokenized sentence data with dependency relations and generates a graphical representation in the form of an SVG file.
+
+---
 
 ## Features
-- **Parsing USR Data**: The parser handles USR data with tokens, their dependencies, and inter-sentence relations.
-- **Graph Visualization**: Visualizes the sentence structure using Graphviz, with clear indications of token dependencies and relationships.
-- **Construction and Inter-relations**: The tool also supports construction clusters and inter-sentence relations for a more comprehensive view.
+- **Parsing USR Data**: Handles USR data with tokens, their dependencies, and inter-sentence relations.
+- **Graph Visualization**: Visualizes sentence structure using Graphviz, with clear indications of token dependencies and relationships.
+- **Construction and Inter-relations**: Supports construction clusters and inter-sentence relations for a comprehensive view.
+
+---
 
 ## Project Structure
 
+- `usr_parser.py`: The main Python script for parsing USR data and generating the Graphviz representation.
+- `USR_to_Graph.sh`: A shell script to automate the process of running the parser and generating the SVG visualization.
+- `input_file.txt`: Example input file containing USR data.
+- `output_graph.svg`: The resulting SVG file generated after running the script.
+
+---
 
 ## Requirements
 
 - **Python 3.x**  
 - **Graphviz**  
   Install it via your package manager or [Graphviz Downloads](https://graphviz.gitlab.io/download/).
-
 - Install the required Python libraries:
     ```bash
     pip install graphviz
     ```
 
+---
+
+## Setup Instructions
+
+### Step 1: Clone the Repository
+```bash
+git clone <repository_url>
+cd <repository_name>
+```
+
+### Step 2: Create a Virtual Environment
+```bash
+python3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
+
+### Step 3: Install Requirements
+```bash
+pip install -r requirements.txt
+```
+
+### Step 4: Make the Shell Script Executable
+```bash
+chmod +x USR_to_Graph.sh
+```
+
+---
+
 ## How to Use
 
 ### Step 1: Prepare Your Input File
+Create a text file (`input_file.txt`) containing the USR data in the expected format. For example:
 
-Create a text file (`input_file.txt`) containing the USR data. This should be in the format defined by the parser, with sentences, tokens, part-of-speech tags, dependencies, etc.
-
-### Step 2: Run the Shell Script
-
-1. Make the shell script executable:
-    ```bash
-    chmod +x USR_to_Graph.sh
-    ```
-
-2. Run the script with the path to your input file:
-    ```bash
-    ./USR_to_Graph.sh input_file.txt
-    ```
-
-### Step 3: View the Output
-
-After running the script, the generated visualization will be saved as `output_graph.svg` in the same directory. You can open this SVG file in any browser or vector graphic editor to view the parsed sentence structure.
-
-## Example Input
-
-Here’s an example of how the input might look:
-
+```
 <sent_id=Geonios_ch_0002>
 #उसका एक दोस्त मोहन है ।
 $wyax	1	-	-	3:rhh	1.1:coref	-	-	-
-eka_1(a_2)	2	-	-	3:quant	-	-	-	-
-xoswa_1(friend_1)	3	-	-	5:k1	-	-	-	-
-mohana	4	per/male	-	5:k1s	-	-	-	-
-hE_1-pres(state_copula_1-pres)	5	-	-	0:main	-	-	-	-
+eka_1(a_2)	2	-	-	3:quant	-	-	-
+xoswa_1(friend_1)	3	-	-	5:k1	-	-	-
+mohana	4	per/male	-	5:k1s	-	-	-
+hE_1-pres(state_copula_1-pres)	5	-	-	0:main	-	-	-
 %affirmative
 </sent_id>
+```
+
+### Step 2: Run the Shell Script
+Run the shell script with the path to your input file:
+```bash
+./USR_to_Graph.sh input_file.txt
+```
+
+### Step 3: View the Output
+After running the script, the generated visualization will be saved as `output_graph.svg` in the same directory. Open the SVG file in a browser or vector graphic editor to view the parsed sentence structure.
+
+---
+
+## Example Input and Output
+
+### Example Input (`input_file.txt`)
+```plaintext
+<sent_id=3>
+#राम और मोहन पास के एक स्कूल में पढ़ते हैं ।
+#Ram and Mohan study in a nearby school ।
+rAma	6	per/male	-	-	-	-	-	1:op1
+mohana	7	per/male	-	-	-	-	-	1:op2
+[conj_1]	1	-	-	5:k1	-	-	-	-
+pAsa_1(nearby_1)	2	-	-	4:r6	-	-	-	-
+eka_1(a_2)	3	-	-	4:quant	-	-	-	-
+skUla_1(school_10)	4	-	-	5:k7p	-	-	-	-
+paDZa_1-wA_hE_1(study_3-pres)	5	-	-	0:main	-	-	-	-
+%affirmative
+</sent_id>
+```
+
+### Output
+The output will be an SVG file named `output_graph.svg`, visually representing token dependencies and inter-sentence relations.
 
 
 
+![Screenshot from 2024-12-28 10-10-32](https://github.com/user-attachments/assets/c1df192a-d75f-40e8-aa17-f71be4adf356)
 
-
-
-## Output
-
-The output will be an SVG file (`output_graph.svg`), representing the token dependencies and inter-sentence relations in a graphical form.
+---
 
 ## License
 
 This project is open-source and available under the [MIT License](LICENSE).
 
+---
+
 ## Acknowledgments
 
 - **Graphviz**: Used for visualizing sentence structures.
 - **Python**: The primary language used for the parser and visualizer.
-
