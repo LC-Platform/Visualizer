@@ -60,7 +60,12 @@ source venv/bin/activate
 
 ### Step 3: Install Requirements
 ```bash
-pip install graphviz
+pip install graphviz   #windows
+```
+
+```bash
+sudo apt update
+sudo apt install graphviz   # for linux
 ```
 
 ### Step 4: Make the Shell Script Executable
