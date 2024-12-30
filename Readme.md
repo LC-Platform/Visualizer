@@ -13,7 +13,7 @@ This project provides a Python-based tool to parse USR (Universal Sentence Repre
 
 ## Project Structure
 
-- `usr_parser.py`: The main Python script for parsing USR data and generating the Graphviz representation.
+- `USR_to_Graph.py`: The main Python script for parsing USR data and generating the Graphviz representation.
 - `USR_to_Graph.sh`: A shell script to automate the process of running the parser and generating the SVG visualization.
 - `input_file.txt`: Example input file containing USR data.
 - `output_graph.svg`: The resulting SVG file generated after running the script.
