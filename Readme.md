@@ -93,9 +93,11 @@ paDZa_1-wA_hE_1(study_3-pres)	5	-	-	0:main	-	-	-	-
 ### Step 2: Run the Shell Script
 Run the shell script with the path to your input file:
 ```bash
-./USR_to_Graph.sh input_file.txt
+./USR_to_Graph.sh input_file.txt Geonios_ch_0006   #incase of single sentences
 ```
-
+```bash
+./USR_to_Graph.sh input.txt Geonios_ch_0006 Geonios_ch_0007a    # incase of multiple sentences
+```
 ### Step 3: View the Output
 After running the script, the generated visualization will be saved as `output_graph.svg` in the same directory. Open the SVG file in a browser or vector graphic editor to view the parsed sentence structure.
 
