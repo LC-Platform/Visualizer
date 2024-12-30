@@ -1,4 +1,4 @@
-# USR Parser and Visualizer
+# USR Visualizer
 
 This project provides a Python-based tool to parse USR (Universal Sentence Representation) data and visualize its hierarchical structure using Graphviz. The parser processes tokenized sentence data with dependency relations and generates a graphical representation in the form of an SVG file.
 
