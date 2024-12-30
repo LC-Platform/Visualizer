@@ -9,7 +9,7 @@ def parse_usrs(usrs_text):
     current_sentence_id = None
     current_tokens = []
     main_token = None
-    inter_relations = []
+    discourse_relations = []
 
     for line in usrs_text.strip().splitlines():
         line = line.strip()
@@ -17,7 +17,7 @@ def parse_usrs(usrs_text):
         # Handle sentence ID (lines starting with <sent_id=)
         if line.startswith("<sent_id="):
             if current_sentence_id:
-                sentences[current_sentence_id] = create_json(current_tokens, main_token, inter_relations)
+                sentences[current_sentence_id] = create_json(current_tokens, main_token, discourse_relations)
             current_sentence_id = re.search(r"<sent_id=(\S+)>", line).group(1)
             current_tokens = []
             main_token = None
@@ -62,75 +62,95 @@ def parse_usrs(usrs_text):
             if dependency_info.endswith("0:main"):
                 main_token = token_id
 
+            print(f"Appending token: {token_id} - {word}")
             current_tokens.append({"id": token_id, "word": word, "relations": relations, "info": info})
 
             # Process inter-relations from the additional_info field
             if info["additional_info"] != "-":
-                inter_relations += parse_inter_relations(info["additional_info"], token_id, current_sentence_id, sentences)
+                discourse_relations += parse_discourse_relations(info["additional_info"], token_id, current_sentence_id, sentences)
 
 
         if current_sentence_id:
-            sentences[current_sentence_id] = create_json(current_tokens, main_token, inter_relations)
+            sentences[current_sentence_id] = create_json(current_tokens, main_token, discourse_relations)
     
     return sentences
 
-def parse_inter_relations(data, source_token, source_sentence, sentences):
-    inter_relations = []
+
+
+def parse_discourse_relations(data, source_token, source_sentence, sentences):
+    discourse_relations = []
+    
+    # Split the input data (additional_info) into individual relations
     for relation in data.split("|"):
         if ":" in relation:
             target_sentence_id, relation_type = relation.split(":")
-
-            # Case 1: Target is within the same sentence (e.g., "1:coref")
+            
+            # Handle relations within the same sentence
             if target_sentence_id.isdigit():
-                target_sentence = source_sentence  # Same sentence
+                target_sentence = source_sentence  # Same sentence as source_sentence
                 target_token = target_sentence_id  # Token ID in the same sentence
-            # Case 2: Target is in a different sentence (e.g., "2.3:coref")
-            elif '.' in target_sentence_id:
-                target_sentence, target_token = target_sentence_id.split(".")
-            else:
-                target_sentence, target_token = target_sentence_id, None
 
-            target_sentence_found = None
-            target_word = None
-
-            # Check if the target is within the current sentence
-            if target_sentence == source_sentence:
-                target_sentence_found = source_sentence  # Same sentence
-
-                # Locate the target word within the current sentence
+                # Debug: Ensure target token exists
+                print(f"Searching for target token ID: {target_token}") 
+                
+                # Iterate over all tokens in the current sentence
+                target_word = None
                 for token in sentences[source_sentence].get("tokens", []):
-                    if token["id"] == target_token:  # Match token ID
+                    print(f"Comparing token ID: {token['id']} with target token: {target_token}")
+                    # Ensure we're comparing as integers, not strings
+                    if int(token["id"]) == int(target_token):  # Convert both to integers for comparison
                         target_word = token["word"]
-                        break
+                
+                # Debug: Output target token match
+                if target_word:
+                    print(f"Found target token: {target_word} (ID: {target_token})")
+                else:
+                    print(f"No match found for Target Token ID: {target_token} in sentence {source_sentence}")
+
+            # Handle relations across sentences (if applicable)
             else:
-                # Otherwise, look for the target in other sentences
+                target_sentence = target_sentence_id  # Assuming it’s across sentences
+                target_token = None
+                target_word = None
+
+                # If target_sentence contains a '.', it's a reference to a token in a different sentence
+                if '.' in target_sentence_id:
+                    target_sentence, target_token = target_sentence_id.split(".")
+                else:
+                    target_sentence, target_token = target_sentence_id, None
+
+                # Search for the target sentence
+                target_sentence_found = None
                 for sentence_id in sentences:
                     if target_sentence in sentence_id:
                         target_sentence_found = sentence_id
                         break
 
                 if target_sentence_found and target_token:
-                    # Locate the target word in the identified sentence
+                    # Iterate over tokens in the found target sentence to match the target token
                     for token in sentences[target_sentence_found].get("tokens", []):
-                        if token["id"] == target_token:
+                        if int(token["id"]) == int(target_token):
                             target_word = token["word"]
-                            break
+                            
 
-            inter_relations.append({
+            # Add the inter-relation to the list
+            discourse_relations.append({
                 "source_token": source_token,
                 "target_token": target_token,
                 "target_word": target_word,
                 "source_sentence": source_sentence,
-                "target_sentence": target_sentence_found if target_sentence_found else target_sentence,
+                "target_sentence": target_sentence,
                 "relation": relation_type
             })
-    return inter_relations
+
+    print(f"Final Inter-Relations: {discourse_relations}")
+    return discourse_relations
 
 
 
 
 
-def create_json(tokens, main_token, inter_relations):
+def create_json(tokens, main_token, discourse_relations):
     # Create a mapping from token words to their IDs
     index_to_id = {token["word"]: token["id"] for token in tokens}
 
@@ -154,7 +174,7 @@ def create_json(tokens, main_token, inter_relations):
 
     # Process inter-relations (sentence-level relations)
     sentence_relations = []
-    for relation in inter_relations:
+    for relation in discourse_relations:
         sentence_relations.append({
             "source_token": relation["source_token"],
             "target_token": relation["target_token"],
@@ -167,7 +187,7 @@ def create_json(tokens, main_token, inter_relations):
     return {
         "tokens": updated_tokens,
         "main": main_token,
-        "inter_relations": sentence_relations
+        "discourse_relations": sentence_relations
     }
 
 
@@ -241,12 +261,13 @@ def convert_usr_to_dot(usr_data):
                     cluster.node(node)
 
         # Add inter-sentence relationships
-        for relation in sentence['inter_relations']:
+        for relation in sentence['discourse_relations']:
             source_token_node = f'{relation["source_sentence"]}_{relation["source_token"]}'
             target_token_node = f'{relation["target_sentence"]}_{relation["target_word"]}'
             dot.edge(source_token_node, target_token_node, label=relation["relation"], color='red', style='dotted')
 
     return dot
+
 
 
 # Example usage
