@@ -250,17 +250,28 @@ def convert_usr_to_dot(usr_data):
 
 # Example usage
 if __name__ == '__main__':
-    
-    if len(sys.argv) != 2:
-        print("Usage: python USR_to_Graph.py <input_file>")
+    if len(sys.argv) != 3:
+        print("Usage: python USR_to_Graph.py <input_file> <sent_id>")
         sys.exit(1)
 
     input_file = sys.argv[1]
+    sent_id_filter = sys.argv[2]
 
     with open(input_file, "r", encoding="utf-8") as file:
         usrs_text = file.read()
 
+    # Parse the data
     parsed_data = parse_usrs(usrs_text)
-    dot_graph = convert_usr_to_dot(parsed_data)
-    dot_graph.render('output_graph', format='svg', cleanup=True)
-    print("Graph rendered as output_graph.svg")
+
+    # Filter by sent_id
+    if sent_id_filter not in parsed_data:
+        print(f"Error: Sentence ID '{sent_id_filter}' not found in the input file.")
+        sys.exit(1)
+
+    filtered_data = {sent_id_filter: parsed_data[sent_id_filter]}
+
+    # Generate the graph
+    dot_graph = convert_usr_to_dot(filtered_data)
+    output_file = f'output_graph_{sent_id_filter}'
+    dot_graph.render(output_file, format='svg', cleanup=True)
+    print(f"Graph rendered as {output_file}.svg")
