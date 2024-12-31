@@ -3,13 +3,13 @@ import json
 from graphviz import Digraph
 import sys
 
-# Code 1: Parsing function
+
 def parse_usrs(usrs_text):
     sentences = {}
     current_sentence_id = None
     current_tokens = []
     main_token = None
-    discourse_relations = []
+    inter_relations = []
 
     for line in usrs_text.strip().splitlines():
         line = line.strip()
@@ -17,7 +17,7 @@ def parse_usrs(usrs_text):
         # Handle sentence ID (lines starting with <sent_id=)
         if line.startswith("<sent_id="):
             if current_sentence_id:
-                sentences[current_sentence_id] = create_json(current_tokens, main_token, discourse_relations)
+                sentences[current_sentence_id] = create_json(current_tokens, main_token, inter_relations)
             current_sentence_id = re.search(r"<sent_id=(\S+)>", line).group(1)
             current_tokens = []
             main_token = None
@@ -33,15 +33,15 @@ def parse_usrs(usrs_text):
             token_data = line.split("\t")
             token_id = token_data[0]
             word = token_data[1]
-            part_of_speech = token_data[2] if len(token_data) > 2 else "-"
+            semantic_category = token_data[2] if len(token_data) > 2 else "-"
             dependency_info = token_data[4] if len(token_data) > 4 else "-"
             construction_info = token_data[8] if len(token_data) > 8 else "-"
             
             # Prepare info with the required columns
             info = {
-                "part_of_speech": part_of_speech,
-                "dependency": dependency_info,
-                "extra_info": token_data[3] if len(token_data) > 3 else "-",
+                "semantic_category": semantic_category,
+                "morpho_semantic": token_data[3] if len(token_data) > 3 else "-",
+                "speakers_view": token_data[6] if len(token_data) > 6 else "-",
                 "additional_info": token_data[5] if len(token_data) > 5 else "-"
              }
 
@@ -62,95 +62,75 @@ def parse_usrs(usrs_text):
             if dependency_info.endswith("0:main"):
                 main_token = token_id
 
-            print(f"Appending token: {token_id} - {word}")
             current_tokens.append({"id": token_id, "word": word, "relations": relations, "info": info})
 
             # Process inter-relations from the additional_info field
             if info["additional_info"] != "-":
-                discourse_relations += parse_discourse_relations(info["additional_info"], token_id, current_sentence_id, sentences)
+                inter_relations += parse_inter_relations(info["additional_info"], token_id, current_sentence_id, sentences)
 
 
         if current_sentence_id:
-            sentences[current_sentence_id] = create_json(current_tokens, main_token, discourse_relations)
+            sentences[current_sentence_id] = create_json(current_tokens, main_token, inter_relations)
     
     return sentences
 
-
-
-def parse_discourse_relations(data, source_token, source_sentence, sentences):
-    discourse_relations = []
-    
-    # Split the input data (additional_info) into individual relations
+def parse_inter_relations(data, source_token, source_sentence, sentences):
+    inter_relations = []
     for relation in data.split("|"):
         if ":" in relation:
             target_sentence_id, relation_type = relation.split(":")
-            
-            # Handle relations within the same sentence
+
+            # Case 1: Target is within the same sentence (e.g., "1:coref")
             if target_sentence_id.isdigit():
-                target_sentence = source_sentence  # Same sentence as source_sentence
+                target_sentence = source_sentence  # Same sentence
                 target_token = target_sentence_id  # Token ID in the same sentence
-
-                # Debug: Ensure target token exists
-                print(f"Searching for target token ID: {target_token}") 
-                
-                # Iterate over all tokens in the current sentence
-                target_word = None
-                for token in sentences[source_sentence].get("tokens", []):
-                    print(f"Comparing token ID: {token['id']} with target token: {target_token}")
-                    # Ensure we're comparing as integers, not strings
-                    if int(token["id"]) == int(target_token):  # Convert both to integers for comparison
-                        target_word = token["word"]
-                
-                # Debug: Output target token match
-                if target_word:
-                    print(f"Found target token: {target_word} (ID: {target_token})")
-                else:
-                    print(f"No match found for Target Token ID: {target_token} in sentence {source_sentence}")
-
-            # Handle relations across sentences (if applicable)
+            # Case 2: Target is in a different sentence (e.g., "2.3:coref")
+            elif '.' in target_sentence_id:
+                target_sentence, target_token = target_sentence_id.split(".")
             else:
-                target_sentence = target_sentence_id  # Assuming it’s across sentences
-                target_token = None
-                target_word = None
+                target_sentence, target_token = target_sentence_id, None
 
-                # If target_sentence contains a '.', it's a reference to a token in a different sentence
-                if '.' in target_sentence_id:
-                    target_sentence, target_token = target_sentence_id.split(".")
-                else:
-                    target_sentence, target_token = target_sentence_id, None
+            target_sentence_found = None
+            target_word = None
 
-                # Search for the target sentence
-                target_sentence_found = None
+            # Check if the target is within the current sentence
+            if target_sentence == source_sentence:
+                target_sentence_found = source_sentence  # Same sentence
+
+                # Locate the target word within the current sentence
+                for token in sentences[source_sentence].get("tokens", []):
+                    if token["id"] == target_token:  # Match token ID
+                        target_word = token["word"]
+                        break
+            else:
+                # Otherwise, look for the target in other sentences
                 for sentence_id in sentences:
                     if target_sentence in sentence_id:
                         target_sentence_found = sentence_id
                         break
 
                 if target_sentence_found and target_token:
-                    # Iterate over tokens in the found target sentence to match the target token
+                    # Locate the target word in the identified sentence
                     for token in sentences[target_sentence_found].get("tokens", []):
-                        if int(token["id"]) == int(target_token):
+                        if token["id"] == target_token:
                             target_word = token["word"]
-                            
+                            break
 
-            # Add the inter-relation to the list
-            discourse_relations.append({
+            inter_relations.append({
                 "source_token": source_token,
                 "target_token": target_token,
                 "target_word": target_word,
                 "source_sentence": source_sentence,
-                "target_sentence": target_sentence,
+                "target_sentence": target_sentence_found if target_sentence_found else target_sentence,
                 "relation": relation_type
             })
-
-    print(f"Final Inter-Relations: {discourse_relations}")
-    return discourse_relations
+    return inter_relations
 
 
 
 
 
-def create_json(tokens, main_token, discourse_relations):
+def create_json(tokens, main_token, inter_relations):
     # Create a mapping from token words to their IDs
     index_to_id = {token["word"]: token["id"] for token in tokens}
 
@@ -174,7 +154,7 @@ def create_json(tokens, main_token, discourse_relations):
 
     # Process inter-relations (sentence-level relations)
     sentence_relations = []
-    for relation in discourse_relations:
+    for relation in inter_relations:
         sentence_relations.append({
             "source_token": relation["source_token"],
             "target_token": relation["target_token"],
@@ -187,11 +167,8 @@ def create_json(tokens, main_token, discourse_relations):
     return {
         "tokens": updated_tokens,
         "main": main_token,
-        "discourse_relations": sentence_relations
+        "inter_relations": sentence_relations
     }
-
-
-
 
 
 # Code 2: Graph visualization
@@ -227,11 +204,12 @@ def convert_usr_to_dot(usr_data):
             token_node = f'{sent_id}_{token["word"]}'
 
             # Tooltip info
-            tooltip_info = f"POS: {token['info']['part_of_speech']}\n" \
-                           f"Dependency: {token['info']['dependency']}\n" \
-                           f"Extra Info: {token['info']['extra_info']}\n" \
+            tooltip_info = f"semCat: {token['info']['semantic_category']}\n" \
+                           f"morphSem: {token['info']['morpho_semantic']}\n" \
+                           f"speakersView: {token['info']['speakers_view']}\n" \
                            f"Additional Info: {token['info']['additional_info']}"
-
+                           
+                        
             if '[' in token['word'] and ']' in token['word']:
                 special_construction_clusters[token_node] = {"concept": token['word'], "connected_nodes": set()}
                 dot.node(token_node, label=token['word'], shape='box', tooltip=tooltip_info)
@@ -261,7 +239,7 @@ def convert_usr_to_dot(usr_data):
                     cluster.node(node)
 
         # Add inter-sentence relationships
-        for relation in sentence['discourse_relations']:
+        for relation in sentence['inter_relations']:
             source_token_node = f'{relation["source_sentence"]}_{relation["source_token"]}'
             target_token_node = f'{relation["target_sentence"]}_{relation["target_word"]}'
             dot.edge(source_token_node, target_token_node, label=relation["relation"], color='red', style='dotted')
