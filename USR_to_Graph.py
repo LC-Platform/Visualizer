@@ -18,7 +18,7 @@ def parse_usrs(usrs_text):
         if line.startswith("<sent_id="):
             if current_sentence_id:
                 sentences[current_sentence_id] = create_json(current_tokens, main_token, inter_relations)
-            current_sentence_id = re.search(r"<sent_id=(\S+)>", line).group(1)
+            current_sentence_id = re.search(r"<sent_id=\s*(\S+)>", line).group(1)
             current_tokens = []
             main_token = None
             inter_relations = []
