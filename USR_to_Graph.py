@@ -3,7 +3,7 @@ import json
 from graphviz import Digraph
 import sys
 
-
+# Code 1: Parsing function
 def parse_usrs(usrs_text):
     sentences = {}
     current_sentence_id = None
@@ -130,6 +130,7 @@ def parse_inter_relations(data, source_token, source_sentence, sentences):
 
 
 
+
 def create_json(tokens, main_token, inter_relations):
     # Create a mapping from token words to their IDs
     index_to_id = {token["word"]: token["id"] for token in tokens}
@@ -176,13 +177,14 @@ def convert_usr_to_dot(usr_data):
     dot = Digraph(comment='USR Representation')
     
     def natural_sort_key(s):
-    # Extract numbers and characters for sorting
+        # Extract numbers and characters for sorting
         return [int(text) if text.isdigit() else text.lower() for text in re.split(r'(\d+)', s)]
 
     # Sort the sentences by their IDs
     sorted_sentence_ids = sorted(usr_data.keys(), key=natural_sort_key)
     
 
+    # Process each sentence
     for sent_id in sorted_sentence_ids:
         sentence = usr_data[sent_id]
         sent_node = f'sent_{sent_id}'
@@ -196,20 +198,17 @@ def convert_usr_to_dot(usr_data):
         # Connect the sentence node to the main predicate
         dot.edge(sent_node, main_node, label='main', fontsize='10')
 
-        # Identify all special constructions and their connected nodes with specific relations
+        # Handle special constructions
         special_construction_clusters = {}
 
-        # Create nodes for all the tokens in the sentence
+        # Create nodes for all tokens in the sentence
         for token in sentence['tokens']:
             token_node = f'{sent_id}_{token["word"]}'
-
-            # Tooltip info
             tooltip_info = f"semCat: {token['info']['semantic_category']}\n" \
                            f"morphSem: {token['info']['morpho_semantic']}\n" \
                            f"speakersView: {token['info']['speakers_view']}\n" \
                            f"Additional Info: {token['info']['additional_info']}"
                            
-                        
             if '[' in token['word'] and ']' in token['word']:
                 special_construction_clusters[token_node] = {"concept": token['word'], "connected_nodes": set()}
                 dot.node(token_node, label=token['word'], shape='box', tooltip=tooltip_info)
@@ -247,8 +246,6 @@ def convert_usr_to_dot(usr_data):
     return dot
 
 
-
-# Example usage
 if __name__ == '__main__':
     if len(sys.argv) != 3:
         print("Usage: python USR_to_Graph.py <input_file> <sent_id>")
@@ -263,12 +260,16 @@ if __name__ == '__main__':
     # Parse the data
     parsed_data = parse_usrs(usrs_text)
 
-    # Filter by sent_id
-    if sent_id_filter not in parsed_data:
-        print(f"Error: Sentence ID '{sent_id_filter}' not found in the input file.")
-        sys.exit(1)
+    # Filter by sent_id and find discourse-related sentences
+    filtered_data = {}
+    if sent_id_filter in parsed_data:
+        filtered_data[sent_id_filter] = parsed_data[sent_id_filter]
 
-    filtered_data = {sent_id_filter: parsed_data[sent_id_filter]}
+    # Check for any inter-sentence relations and include them
+    for relation in parsed_data.get(sent_id_filter, {}).get("inter_relations", []):
+        target_sentence = relation["target_sentence"]
+        if target_sentence and target_sentence not in filtered_data:
+            filtered_data[target_sentence] = parsed_data[target_sentence]
 
     # Generate the graph
     dot_graph = convert_usr_to_dot(filtered_data)
