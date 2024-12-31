@@ -106,6 +106,7 @@ Run the shell script with the path to your input file:
 ### Step 3: View the Output
 After running the script, the generated visualization will be saved as `output_graph.svg` in the same directory. Open the SVG file in a browser or vector graphic editor to view the parsed sentence structure.
 
+Open the svg file using a browser to view the svg graph
 ---
 
 ## Example Input and Output
