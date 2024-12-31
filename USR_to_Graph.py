@@ -188,7 +188,7 @@ def convert_usr_to_dot(usr_data):
     for sent_id in sorted_sentence_ids:
         sentence = usr_data[sent_id]
         sent_node = f'sent_{sent_id}'
-        dot.node(sent_node, f'Sentence {sent_id}', shape='ellipse')
+        dot.node(sent_node, f'Sentence {sent_id}', shape='ellipse', color='blue', fillcolor='lightblue', style='filled')
 
         # Main predicate of the sentence
         main_token = sentence['main']
