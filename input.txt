@@ -1,13 +1,9 @@
-<sent_id=Test_025>
-#स्टेम सेल संग्रह सत्र लगभग 2-5 घंटे तक चलता है ।
-stema_1	1	-	-	-	-	-	-	12:begin
-sela_1	2	-	-	9:k1	-	-	-	-
-saMgraha_1	3	-	-	-	-	-	-	13:mod
-sawra_1	4	-	-	-	-	-	-	13:head
-2-5	6	-	-	7:card	-	-	-	-
-GaMtA_1	7	-	pl	9:k7t	-	-	-	-
-cala_1-wA_hE_1	9	-	-	0:main	-	-	-	-
-[ne_1]	12	org	-	-	-	-	-	-
-[nc_1]	13	-	-	-	-	-	-	-
-%affirmative
+<sent_id=Test_001INFOSHEET>
+#स्वस्थ दाताओं के लिए-सूचना पत्र ।
+svasWa_1	1	-	-	2:mod	-	-	-	-
+xAwA_2	2	anim	pl	5:rt	-	-	-	-
+sUcanA_1	3	-	-	-	-	-	-	5:mod
+pawra_1	4	-	-	-	-	-	-	5:head
+[nc_1]	5	-	-	0:main	-	-	-	-
+%title
 </sent_id>

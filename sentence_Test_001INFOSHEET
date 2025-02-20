@@ -1,0 +1,37 @@
+// USR Representation
+digraph {
+	fontsize=6 height=0.75 "node"="*" width=1.5
+	sent_Test_001INFOSHEET [label="Sentence Test_001INFOSHEET" color=blue fillcolor=lightblue shape=ellipse style=filled]
+	"[nc_1]_5" [label="[nc_1]_5" fillcolor=lightgray shape=ellipse]
+	sent_Test_001INFOSHEET -> "[nc_1]_5" [label=main fontsize=8]
+	svasWa_1_1 [label=svasWa_1_1 tooltip="semCat: -
+morphSem: -
+speakersView: -
+Additional Info: -"]
+	xAwA_2_2 [label=xAwA_2_2 tooltip="semCat: anim
+morphSem: pl
+speakersView: -
+Additional Info: -"]
+	sUcanA_1_3 [label=sUcanA_1_3 tooltip="semCat: -
+morphSem: -
+speakersView: -
+Additional Info: -"]
+	pawra_1_4 [label=pawra_1_4 tooltip="semCat: -
+morphSem: -
+speakersView: -
+Additional Info: -"]
+	"[nc_1]_5" [label="[nc_1]_5" shape=box tooltip="semCat: -
+morphSem: -
+speakersView: -
+Additional Info: -"]
+	xAwA_2_2 -> svasWa_1_1 [label=mod fontcolor=blue]
+	"[nc_1]_5" -> xAwA_2_2 [label=rt fontcolor=blue]
+	"[nc_1]_5" -> sUcanA_1_3 [label=mod fontcolor=blue]
+	"[nc_1]_5" -> pawra_1_4 [label=head fontcolor=blue]
+	subgraph "cluster_[nc_1]_5" {
+		color=black fillcolor=lightgray label="Construction: [nc_1]_5" style="filled,dashed"
+		"[nc_1]_5" [label="[nc_1]_5" shape=box]
+		sUcanA_1_3
+		pawra_1_4
+	}
+}
