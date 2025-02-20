@@ -308,6 +308,6 @@ if __name__ == '__main__':
     dot = process_and_visualize(usrs_text, sent_id_filter)
 
     # Save the output as an SVG file``
-    output_file = f"sentence_{sent_id_filter}.svg"
+    output_file = f"sentence_{sent_id_filter}"
     dot.render(output_file, format="svg")
     print(f"Graph saved as {output_file}")
