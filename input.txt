@@ -1,9 +1,96 @@
-<sent_id=Test_001INFOSHEET>
-#स्वस्थ दाताओं के लिए-सूचना पत्र ।
-svasWa_1	1	-	-	2:mod	-	-	-	-
-xAwA_2	2	anim	pl	5:rt	-	-	-	-
-sUcanA_1	3	-	-	-	-	-	-	5:mod
-pawra_1	4	-	-	-	-	-	-	5:head
-[nc_1]	5	-	-	0:main	-	-	-	-
-%title
+<sent_id=3>
+#राम और मोहन पास के एक स्कूल में पढ़ते हैं ।
+#Ram and Mohan study in a nearby school ।
+rAma	6	per/male	-	-	-	-	-	1:op1
+mohana	7	per/male	-	-	-	-	-	1:op2
+[conj_1]	1	-	-	5:k1	-	-	-	-
+pAsa_1(nearby_1)	2	-	-	4:r6	-	-	-	-
+eka_1(a_2)	3	-	-	4:quant	-	-	-	-
+skUla_1(school_10)	4	-	-	5:k7p	-	-	-	-
+paDZa_1-wA_hE_1(study_3-pres)	5	-	-	0:main	-	-	-	-
+%affirmative
+</sent_id>
+
+
+<sent_id=2>
+#वही एक मैदान उनके खेलने के लिए वहाँ पर था ।
+vahI	1	-	-	3:dem	-	-	-	-
+eka_1	2	numex	-	3:card	-	-	-	-
+mExAna_1	3	-	-	10:k1	-	-	-	-
+$wyax	4	-	pl	5:k1	-	distal	-	-
+Kela_1	5	-	pl	10:rt	-	-	-	-
+vahAz	8	-	pl	10:k7p	-	-	-	-
+hE_1-past	10	-	-	0:main	-	-	-	-
+%affirmative
+</sent_id>
+
+
+
+
+<sent_id=5>
+#उसने यह बात अपने सहपाठियों को बताई ।
+$wyax	1	-	-	7:k1	-	distal	-	-
+$wyax	2	-	-	3:dem	-	proximal	-	-
+bAwa_1	3	-	-	7:k2	-	-	-	-
+apanA	4	-	pl	5:r6	-	-	-	-
+sahapATI_1	5	-	pl	7:k4	-	-	-	-
+bawA_1-yA_1	7	-	-	0:main	-	-	-	-
+%affirmative
+</sent_id>
+
+
+<sent_id=biology_chapter3_plantkingdom_173>
+#कोनिफ़र्स में , सुई जैसी पत्तियाँ सतह क्षेत्र को कम कर देती हैं ।
+koniPZarsa	1	-	-	11:k7p	-	-	-	-
+suI_1	4	-	-	11:ru	-	-	-	-
+pawwI_1	6	-	-	11:k1	-	-	-	-
+sawaha_1	7	-	-	-	-	-	-	15:mod
+kRewra_1	8	-	-	-	-	-	-	15:head
+kara_1-wA_hE_1	11	-	-	-	-	[shade:xe_1]	-	16:verbalizer
+[nc_1]	15	-	-	11:k2	-	-	-	-
+[cp_1]	16	-	-	0:main	-	-	-	-
+%affirmative
+</sent_id>
+
+
+
+<sent_id=biology_chapter3_plantkingdom_174>
+#उनके मोटे क्यूटिकल और धँसे हुए रंध्र भी पानी की कमी को कम करने में मदद करते हैं ।
+$wyax	1	-	-	3:r6	biology_chapter3_plantkingdom_173.4:coref	distal	-	-
+motA_1	2	-	-	3:mod	-	-	-	-
+kyUtikala_1	3	-	-	-	-	-	-	22:op1
+Xazsa_1	5	-	-	7:rvks	-	-	-	-
+raMXra_1	7	-	-	-	-	-	-	22:op2
+pAnI_1	9	-	-	11:r6	-	-	-	-
+kamI_1	11	-	-	14:k2	-	-	-	-
+kara_1	14	-	-	-	-	-	-	20:verbalizer
+maxaxa_1	16	-	-	-	-	-	-	21:kriyAmUla
+kara_1-wA_hE_1	17	-	-	-	-	-	-	21:verbalizer
+[cp_1]	20	-	-	17:k7	-	-	-	-
+[cp_2]	21	-	-	0:main	-	-	-	-
+[conj_1]	22	-	-	17:k1	-	-	-	-
+%affirmative
+</sent_id>
+
+
+
+<sent_id=4>
+#कवक, और मोनेरा और प्रोटिस्टा के कोशिका भित्ति वाले सदस्यों को अब प्लांटे से बाहर कर दिया गया है।
+#kavaka, Ora monerA Ora protistA ke koSikA Biwwi vAle saxasyoM ko aba plAMte se bAhara kara xiyA gayA hE, hAlAMki pahale ke vargIkaraNoM ne unheM eka hI sAmrAjya meM raKA WA.
+#Fungi, and members of the Monera and Protista having cell walls have now been excluded from Plantae.
+kavaka_1(fungus_1)	1	-	-	-	-	-	-	27:op1
+^monerA_1	4	-	-	-	-	-	-	28:op1
+^protistA_1	6	-	-	-	-	-	-	28:op2
+koSikA_1(cell_1)	8	-	-	-	-	-	-	29:mod
+Biwwi_1(wall_2)	9	-	mawup	-	-	-	-	29:head
+saxasya_1(member_4)	11	-	pl	-	-	-	-	27:op2
+aba_1(now_3)	13	-	-	26:k7t	-	-	-	-
+^plAMte_1	14	-	-	26:k5	-	-	-	-
+bAhara_1(out_1)	16	-	-	-	-	-	-	26:kriyAmUla
+kara_1-yA_jA_1	17	-	-	-	-	[shade:xe_1]	-	26:verbalizer
+[cp_1]	26	-	-	0:main	-	-	-	-
+[conj_1]	27	-	-	26:k2	-	-	-	-
+[conj_2]	28	-	-	29:r6	-	-	-	-
+[nc_1]	29	-	-	11:r6	-	-	-	-
+%affirmative
 </sent_id>

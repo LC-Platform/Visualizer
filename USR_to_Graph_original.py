@@ -197,80 +197,97 @@ def convert_usr_to_dot(usr_data):
 
     # Process each sentence
     for sent_id, sentence in usr_data.items():
-        sent_node = f'sent_{sent_id}'
-        dot.node(sent_node, f'Sentence {sent_id}', shape='ellipse', color='blue', fillcolor='lightblue', style='filled')
-
-        main_token = sentence['main']
-        if main_token:
-            main_token_combined = main_token  # main_token already combines the word and ID in the previous processing step
-            main_node = f'{main_token_combined}'  # Use the combined word and ID for the main token
-            dot.node(main_node, label=main_token_combined, shape='ellipse', fillcolor='lightgray')
-            print(f"Connecting sentence node {sent_node} to main token {main_node}")
-            dot.edge(sent_node, main_node, label='main', fontsize='8')  # Connect sentence to main token
-
-        # Handle special constructions
-        special_construction_clusters = {}
-
-        # Create nodes for all tokens in the sentence
-        for token in sentence['tokens']:
-            token_word = token["word"]
-            token_node = f'{token_word}_{token["id"]}'  # Unique node for each token using ID
-
-            tooltip_info = f"semCat: {token['info']['semantic_category']}\n" \
-                            f"morphSem: {token['info']['morpho_semantic']}\n" \
-                            f"speakersView: {token['info']['speakers_view']}\n" \
-                            f"Additional Info: {token['info']['additional_info']}"
-
-            # Modify the label to include the token's word and its ID
-            label = f"{token['word']}_{token['id']}"
+            sent_node = f'sent_{sent_id}'
+            dot.node(sent_node, f'Sentence {sent_id}', shape='ellipse', color='blue', fillcolor='lightblue', style='filled')
             
-            # Log the creation of each node
-            print(f"Created token node: {token_node} (Word: {token['word']}, ID: {token['id']})")
-
-            if '[' in token['word'] and ']' in token['word']:
-                special_construction_clusters[token_node] = {"concept": f'{token["word"]}_{token["id"]}', "connected_nodes": set()}
-                dot.node(token_node, label=label, shape='box', tooltip=tooltip_info)
-            else:
-                dot.node(token_node, label=label, tooltip=tooltip_info)
-
-        # Add edges for token relationships
-        for token in sentence['tokens']:
-            token_word = token["word"]
-            token_node = f'{token_word}_{token["id"]}'
-            for relation in token['relations']:
-                target_word = relation['target']
-                target_id = relation['target_id']  # Use target ID as well
-                label = relation['label']
+            if sentence['main']:
+                dot.node(sentence['main'], label=sentence['main'], shape='ellipse', fillcolor='lightgray')
+                dot.edge(sent_node, sentence['main'], label='main', fontsize='8')
+            
+            # Handle tokens and relations
+            special_construction_clusters = {}
+            
+            for token in sentence['tokens']:
+                token_node = f'{token["word"]}_{token["id"]}'
+                # label = f"{token['word']}:{token['id']}"
+                label = f"{token['word']}:{token['id']}\n" 
+                tooltip_info = (
+                    f"semCat: {token['info']['semantic_category']}\n"
+                    f"morphSem: {token['info']['morpho_semantic']}\n"
+                    f"speakersView: {token['info']['speakers_view']}\n"
+                    f"Additional Info: {token['info']['additional_info']}"
+                )
                 
+                if '[' in token['word'] and ']' in token['word']:
+                    special_construction_clusters[token_node] = {
+                        "concept": label,
+                        "connected_nodes": set()
+                    }
+                    dot.node(token_node, label=label, shape='box', tooltip=tooltip_info)
+                else:
+                    dot.node(token_node, label=label, tooltip=tooltip_info)
+            
+            # Add edges
+            for token in sentence['tokens']:
+                token_node = f'{token["word"]}_{token["id"]}'
+                for relation in token['relations']:
+                    if 'target' in relation and 'target_id' in relation:
+                        target_node = f'{relation["target"]}_{relation["target_id"]}'
+                        dot.edge(target_node, token_node, label=relation['label'], fontcolor="blue")
+                        
+                        if '[' in target_node and ']' in target_node:
+                            if target_node in special_construction_clusters:
+                                if relation['label'] in {
+                                    "op1", "op2", "op3", "op4", "op5", "op7", "op8",
+                                    "start", "end", "mod", "head", "count", "unit",
+                                    "component1", "component2", "component3", "component4",
+                                    "component5", "component6", "unit_value", "unit_every",
+                                    "whole", "part", "kriyAmUla", "verbalizer"
+                                }:
+                                    special_construction_clusters[target_node]["connected_nodes"].add(token_node)
+            
+            # Create construction clusters
+            for cluster_token, cluster_data in special_construction_clusters.items():
+                with dot.subgraph(name=f'cluster_{cluster_token}') as cluster:
+                    cluster.attr(
+                        style='filled,dashed',
+                        color='black',
+                        fillcolor='lightgray',
+                        label=f'Construction: {cluster_data["concept"]}'
+                    )
+                    cluster.node(cluster_token, label=cluster_data["concept"], shape='box')
+                    for node in cluster_data["connected_nodes"]:
+                        cluster.node(node)
+                        
+            for relation in sentence.get("inter_relations", []):
+                source_token = f'{relation["source_token"]}'
+                target_token = f'{relation["target_token"]}'
+                target_word = relation["target_word"]
+                target_sentence = relation["target_sentence"]
                 
-                # Create edge between target and source token using both word and ID
-                target_token_node = f'{target_word}_{target_id}'
-                print(f"Creating edge: {token_node} -> {target_token_node} (Label: {label})")
-                dot.edge(target_token_node, token_node, label=label, fontcolor="blue")
+                if not target_token or not target_sentence:
+                    continue  # Skip if target details are missing
+                
+                source_node = None
+                target_node = None
 
-                if '[' in target_token_node and ']' in target_token_node:
-                    if target_token_node in special_construction_clusters:
-                        if label in {"op1", "op2", "op3", "op4", "op5", "op7", "op8", "start", "end", "mod", "head", "count", "unit", "component1", "component2", "component3", "component4", "component5", "component6", "unit_value", "unit_every", "whole", "part", "kriyAmUla", "verbalizer"}:
-                            special_construction_clusters[target_token_node]["connected_nodes"].add(token_node)
+                # Find source node
+                for token in sentence['tokens']:
+                    if str(token['id']) == source_token:
+                        source_node = f'{token["word"]}_{token["id"]}'
+                        break
 
-        # Create clusters for special constructions
-        for cluster_token, cluster_data in special_construction_clusters.items():
-            cluster_name = f'cluster_{cluster_token}'
-            with dot.subgraph(name=cluster_name) as cluster:
-                cluster.attr(style='filled,dashed', color='black', fillcolor='lightgray', label=f'Construction: {cluster_data["concept"]}')
-                cluster.node(cluster_token, label=cluster_data["concept"], shape='box')
-                for node in cluster_data["connected_nodes"]:
-                    cluster.node(node)
+                # Find target node
+                if target_sentence in usr_data:
+                    for token in usr_data[target_sentence]['tokens']:
+                        if str(token['id']) == target_token:
+                            target_node = f'{token["word"]}_{token["id"]}'
+                            break
 
-        # Add coreference edges
-        for token in sentence['tokens']:
-            if 'coref' in token['relations']:
-                for coref_relation in token['relations']['coref']:
-                    source_token_node = f'{token["word"]}_{token["id"]}'
-                    target_token_node = f'{coref_relation["target_word"]}_{coref_relation["target_id"]}'
-                    print(f"Creating coref edge: {source_token_node} -> {target_token_node}")
-                    dot.edge(source_token_node, target_token_node, label='coref', color='red', style='dashed')
-
+                # Add coreference edge
+                if source_node and target_node:
+                    dot.edge(source_node, target_node, label=relation["relation"], color="red", fontcolor="red")
+                
     return dot
 
 

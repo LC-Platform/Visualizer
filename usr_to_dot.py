@@ -264,7 +264,25 @@ def convert_usr_to_dot(usr_data):
 
 # Example usage
 if __name__ == '__main__':
-    usrs_text = """
+    usrs_text = """<segment_id=sept-7-2022ICF-HD_source_hin_040>
+#सीएमसी, वेल्लोर में आपकी वर्तमान और भविष्य की चिकित्सीय देखभाल आपके निर्णय से प्रभावित नहीं होगी।
+sIemasI	1	org	-	-	-	-	-	3:begin
+vellora	2	place	-	-	-	-	-	3:inside
+varwamAna_1	5	-	-	-	-	-	-	15:op1
+BaviRya_2	6	-	-	-	-	-	-	15:op2
+cikiwsIya_3	7	-	-	8:mod	-	-	-	-
+xeKaBAla_1	8	-	-	14:k1	-	-	-	-
+nirNaya_2	10	-	-	14:rh	-	-	-	-
+praBAviwa_1	11	-	-	-	-	-	-	14:kriyAmUla
+nahIM_1	12	-	-	14:neg	-	-	-	-
+ho_1-gA_1	13	-	-	-	-	-	-	14:verbalizer
+[cp_1]	14	-	-	0:main	-	-	-	-
+[conj_1]	15	-	-	8:r6	-	-	-	-
+[ne_1]	3	-	-	14:k7p	-	-	-	-
+$addressee	4	-	-	8:r6	-	respect	-	-
+$addressee	9	-	-	10:r6	-	respect	-	-
+%negative
+</segment_id>
 """
     
     parsed_data = parse_usrs(usrs_text)
