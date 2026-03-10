@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>USR Graph Visualizer</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: system-ui, sans-serif;
+    background: #f5f5f5;
+    color: #222;
+    padding: 32px;
+  }
+
+  h2 {
+    font-size: 20px;
+    margin-bottom: 24px;
+  }
+
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #444;
+  }
+
+  input[type="text"] {
+    width: 320px;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    outline: none;
+  }
+
+  input[type="text"]:focus {
+    border-color: #4a7cf7;
+  }
+
+  textarea {
+    width: 100%;
+    max-width: 700px;
+    height: 200px;
+    padding: 10px;
+    font-family: monospace;
+    font-size: 13px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    resize: vertical;
+    outline: none;
+  }
+
+  textarea:focus {
+    border-color: #4a7cf7;
+  }
+
+  .field { margin-bottom: 18px; }
+
+  button {
+    padding: 8px 18px;
+    font-size: 14px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .btn-primary {
+    background: #4a7cf7;
+    color: white;
+  }
+
+  .btn-primary:hover { background: #3366e0; }
+
+  .btn-sm {
+    background: #e8e8e8;
+    color: #333;
+    padding: 6px 14px;
+    font-size: 13px;
+  }
+
+  .btn-sm:hover { background: #d5d5d5; }
+
+  .zoom-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 20px 0 8px;
+  }
+
+  .zoom-val {
+    font-size: 13px;
+    color: #555;
+    min-width: 42px;
+  }
+
+  .graph-box {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    overflow: hidden;
+    height: 600px;
+    position: relative;
+    cursor: grab;
+  }
+
+  .graph-box:active { cursor: grabbing; }
+
+  #graph-wrapper {
+    transform-origin: 0 0;
+    position: absolute;
+    top: 0; left: 0;
+  }
+
+  #graph-wrapper object {
+    display: block;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+
+<h2>USR Graph Visualizer</h2>
+
+<form method="POST">
+
+  <div class="field">
+    <label>Segment IDs (comma separated)</label>
+    <input type="text" name="sent_ids"
+      value="{{ request.form.sent_ids if request.form.sent_ids else '' }}"
+      placeholder="segment1, segment2" required>
+  </div>
+
+  <div class="field">
+    <label>Paste USR</label>
+    <textarea name="usr" required>{{ request.form.usr if request.form.usr else '' }}</textarea>
+  </div>
+
+  <button type="submit" class="btn-primary">Generate Graph</button>
+
+</form>
+
+{% if graph_file %}
+
+<div class="zoom-bar">
+  <button class="btn-sm" onclick="zoomOut()">−</button>
+  <button class="btn-sm" onclick="zoomIn()">+</button>
+  <button class="btn-sm" onclick="resetZoom()">Reset</button>
+  <button class="btn-sm" onclick="fitView()">Fit</button>
+  <span class="zoom-val" id="zoom-label">100%</span>
+</div>
+
+<div class="graph-box" id="canvas">
+  <div id="graph-wrapper">
+    <object type="image/svg+xml"
+      data="{{ url_for('static', filename=graph_file) }}"
+      id="svg-obj">
+    </object>
+  </div>
+</div>
+
+<script>
+  let scale = 1, panX = 0, panY = 0;
+  let dragging = false, sx, sy;
+  const wrapper = document.getElementById('graph-wrapper');
+  const canvas  = document.getElementById('canvas');
+  const label   = document.getElementById('zoom-label');
+
+  function apply() {
+    wrapper.style.transform = `translate(${panX}px,${panY}px) scale(${scale})`;
+    label.textContent = Math.round(scale * 100) + '%';
+  }
+
+  function zoomIn()    { scale = Math.min(5, scale + 0.2); apply(); }
+  function zoomOut()   { scale = Math.max(0.1, scale - 0.2); apply(); }
+  function resetZoom() { scale = 1; panX = 0; panY = 0; apply(); }
+  function fitView() {
+    const obj = document.getElementById('svg-obj');
+    const cw = canvas.clientWidth, ch = canvas.clientHeight;
+    const ow = obj.offsetWidth || 800, oh = obj.offsetHeight || 600;
+    scale = Math.min(cw / ow, ch / oh) * 0.95;
+    panX = (cw - ow * scale) / 2;
+    panY = (ch - oh * scale) / 2;
+    apply();
+  }
+
+  // Scroll zoom
+  canvas.addEventListener('wheel', e => {
+    e.preventDefault();
+    const r = canvas.getBoundingClientRect();
+    const mx = e.clientX - r.left, my = e.clientY - r.top;
+    const prev = scale;
+    scale = Math.min(5, Math.max(0.1, scale + (e.deltaY < 0 ? 0.15 : -0.15)));
+    panX = mx - (mx - panX) * (scale / prev);
+    panY = my - (my - panY) * (scale / prev);
+    apply();
+  }, { passive: false });
+
+  // Drag pan
+  canvas.addEventListener('mousedown', e => { dragging = true; sx = e.clientX - panX; sy = e.clientY - panY; });
+  window.addEventListener('mousemove', e => { if (!dragging) return; panX = e.clientX - sx; panY = e.clientY - sy; apply(); });
+  window.addEventListener('mouseup',   () => dragging = false);
+</script>
+
+{% endif %}
+
+</body>
+</html>

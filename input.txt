@@ -1,4 +1,4 @@
-<sent_id=3>
+<segment_id=3>
 #राम और मोहन पास के एक स्कूल में पढ़ते हैं ।
 #Ram and Mohan study in a nearby school ।
 rAma	6	per/male	-	-	-	-	-	1:op1
@@ -9,10 +9,10 @@ eka_1(a_2)	3	-	-	4:quant	-	-	-	-
 skUla_1(school_10)	4	-	-	5:k7p	-	-	-	-
 paDZa_1-wA_hE_1(study_3-pres)	5	-	-	0:main	-	-	-	-
 %affirmative
-</sent_id>
+</segment_id>
 
 
-<sent_id=2>
+<segment_id=2>
 #वही एक मैदान उनके खेलने के लिए वहाँ पर था ।
 vahI	1	-	-	3:dem	-	-	-	-
 eka_1	2	numex	-	3:card	-	-	-	-
@@ -22,12 +22,12 @@ Kela_1	5	-	pl	10:rt	-	-	-	-
 vahAz	8	-	pl	10:k7p	-	-	-	-
 hE_1-past	10	-	-	0:main	-	-	-	-
 %affirmative
-</sent_id>
+</segment_id>
 
 
 
 
-<sent_id=5>
+<segment_id=5>
 #उसने यह बात अपने सहपाठियों को बताई ।
 $wyax	1	-	-	7:k1	-	distal	-	-
 $wyax	2	-	-	3:dem	-	proximal	-	-
@@ -36,10 +36,10 @@ apanA	4	-	pl	5:r6	-	-	-	-
 sahapATI_1	5	-	pl	7:k4	-	-	-	-
 bawA_1-yA_1	7	-	-	0:main	-	-	-	-
 %affirmative
-</sent_id>
+</segment_id>
 
 
-<sent_id=biology_chapter3_plantkingdom_173>
+<segment_id=biology_chapter3_plantkingdom_173>
 #कोनिफ़र्स में , सुई जैसी पत्तियाँ सतह क्षेत्र को कम कर देती हैं ।
 koniPZarsa	1	-	-	11:k7p	-	-	-	-
 suI_1	4	-	-	11:ru	-	-	-	-
@@ -50,11 +50,11 @@ kara_1-wA_hE_1	11	-	-	-	-	[shade:xe_1]	-	16:verbalizer
 [nc_1]	15	-	-	11:k2	-	-	-	-
 [cp_1]	16	-	-	0:main	-	-	-	-
 %affirmative
-</sent_id>
+</segment_id>
 
 
 
-<sent_id=biology_chapter3_plantkingdom_174>
+<segment_id=biology_chapter3_plantkingdom_174>
 #उनके मोटे क्यूटिकल और धँसे हुए रंध्र भी पानी की कमी को कम करने में मदद करते हैं ।
 $wyax	1	-	-	3:r6	biology_chapter3_plantkingdom_173.4:coref	distal	-	-
 motA_1	2	-	-	3:mod	-	-	-	-
@@ -70,11 +70,11 @@ kara_1-wA_hE_1	17	-	-	-	-	-	-	21:verbalizer
 [cp_2]	21	-	-	0:main	-	-	-	-
 [conj_1]	22	-	-	17:k1	-	-	-	-
 %affirmative
-</sent_id>
+</segment_id>
 
 
 
-<sent_id=4>
+<segment_id=4>
 #कवक, और मोनेरा और प्रोटिस्टा के कोशिका भित्ति वाले सदस्यों को अब प्लांटे से बाहर कर दिया गया है।
 #kavaka, Ora monerA Ora protistA ke koSikA Biwwi vAle saxasyoM ko aba plAMte se bAhara kara xiyA gayA hE, hAlAMki pahale ke vargIkaraNoM ne unheM eka hI sAmrAjya meM raKA WA.
 #Fungi, and members of the Monera and Protista having cell walls have now been excluded from Plantae.
@@ -93,4 +93,4 @@ kara_1-yA_jA_1	17	-	-	-	-	[shade:xe_1]	-	26:verbalizer
 [conj_2]	28	-	-	29:r6	-	-	-	-
 [nc_1]	29	-	-	11:r6	-	-	-	-
 %affirmative
-</sent_id>
+</segment_id>
