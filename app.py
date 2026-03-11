@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request
 import os
-from USR_to_Graph_original import process_and_visualize
+from USR_to_Graph import process_and_visualize
 
 app = Flask(__name__)
 
