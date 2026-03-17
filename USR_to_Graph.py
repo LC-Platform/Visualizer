@@ -3,7 +3,6 @@ import json
 from graphviz import Digraph
 import sys
 
-# Code 1: Parsing function
 def parse_usrs(usrs_text):
     sentences = {}
     current_sentence_id = None
@@ -21,12 +20,12 @@ def parse_usrs(usrs_text):
             current_tokens = []
             main_token = None
             inter_relations = []
-        
-        elif len(line.split("\t")) == 1:
-            continue  
-        
+
         elif not line.startswith(("#", "<", "%")) and line:
-            line = re.sub(r'\s+', '\t', line).strip()  
+            line = re.sub(r'\s+', '\t', line).strip()   # ← normalize FIRST
+
+            if len(line.split("\t")) <= 1:               # ← THEN skip
+                continue
 
             token_data = line.split("\t")
             token_id = token_data[1]
@@ -34,25 +33,25 @@ def parse_usrs(usrs_text):
             semantic_category = token_data[2] if len(token_data) > 2 else "-"
             dependency_info = token_data[4] if len(token_data) > 4 else "-"
             construction_info = token_data[8] if len(token_data) > 8 else "-"
-            
+
             info = {
                 "semantic_category": semantic_category,
                 "morpho_semantic": token_data[3] if len(token_data) > 3 else "-",
                 "speakers_view": token_data[6] if len(token_data) > 6 else "-",
                 "additional_info": token_data[5] if len(token_data) > 5 else "-"
-             }
+            }
 
             relations = []
             if dependency_info and dependency_info != "-":
                 for dep in dependency_info.split("|"):
                     target, label = dep.split(":")
                     relations.append({"target": target, "label": label})
-                    
+
             elif construction_info and construction_info != "-":
                 for dep in construction_info.split("|"):
                     target, label = dep.split(":")
                     relations.append({"target": target, "label": label})
-            
+
             if "0:main" in dependency_info:
                 main_token = word
 
@@ -61,9 +60,9 @@ def parse_usrs(usrs_text):
             if info["additional_info"] != "-":
                 inter_relations += parse_inter_relations(info["additional_info"], token_id, current_sentence_id, sentences)
 
-        if current_sentence_id:
-            sentences[current_sentence_id] = create_json(current_tokens, main_token, inter_relations)
-    
+    if current_sentence_id:
+        sentences[current_sentence_id] = create_json(current_tokens, main_token, inter_relations)
+
     return sentences
 
 def parse_inter_relations(data, source_token, source_sentence, sentences):
