@@ -65,7 +65,8 @@ def parse_usrs(usrs_text):
 
     return sentences
 
-def parse_inter_relations(data, source_token, source_sentence, sentences):
+# Update the function signature and same-sentence branch:
+def parse_inter_relations(data, source_token, source_sentence, sentences, current_tokens=None):
     inter_relations = []
     for relation in data.split("|"):
         if ":" in relation:
@@ -83,12 +84,15 @@ def parse_inter_relations(data, source_token, source_sentence, sentences):
             target_word = None
 
             if target_sentence == source_sentence:
+                # ↓ Use current_tokens instead of sentences[source_sentence]
                 target_sentence_found = source_sentence
-                for token in sentences[source_sentence].get("tokens", []):
+                token_list = current_tokens or []
+                for token in token_list:
                     if token["id"] == target_token:
                         target_word = token["word"]
                         break
             else:
+                # cross-sentence lookup (unchanged)
                 for sentence_id in sentences:
                     if target_sentence in sentence_id:
                         target_sentence_found = sentence_id
@@ -110,7 +114,6 @@ def parse_inter_relations(data, source_token, source_sentence, sentences):
             })
     print(inter_relations)
     return inter_relations
-
 
 def create_json(tokens, main_token, inter_relations):
     index_to_word = {token["id"]: token["word"] for token in tokens}
